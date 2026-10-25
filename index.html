@@ -66,7 +66,13 @@ nav.tabs button[aria-selected="true"]{background:var(--wine);color:var(--gold-br
 .tile.bal{border-color:var(--wine);background:var(--wine)} .tile.bal .val{color:var(--gold-bright)} .tile.bal .lbl,.tile.bal small{color:#ead9c0}
 .tile small{display:block;color:var(--muted);font-size:.82rem}
 
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media (max-width:540px){.actions{grid-template-columns:1fr 1fr}.actions>.big.cx{grid-column:1 / -1}}
+.big.cx{background:linear-gradient(180deg,#d9b25a,#a87f2c);color:#2b0b13}
+.card.usd{flex-direction:row;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.usd .val{font-weight:700;font-size:1.6rem;color:var(--accent)}
+form.entry.cx{border-color:var(--gold-bright)}
+.cxcalc{background:rgba(0,0,0,.2);border-left:4px solid var(--gold-bright);border-radius:10px;padding:10px 12px;font-weight:700}
 .big{border:0;border-radius:14px;padding:15px 10px;font-size:1.06rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;color:#ffffff}
 .big.in{background:linear-gradient(180deg,#3c8f5c,var(--in-bg))} .big.out{background:linear-gradient(180deg,#c95650,var(--out-bg))}
 .big span{font-size:1.45rem;line-height:1}
@@ -98,7 +104,7 @@ form.entry.in{border-color:var(--in)} form.entry.out{border-color:var(--out)} fo
 
 .day{display:flex;flex-direction:column;gap:6px}
 .dayhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;padding:0 4px}
-.dayhead h3{font-size:1.2rem;text-transform:capitalize}
+.dayhead h3{font-size:1.2rem}
 .daytot{font-size:.9rem;display:flex;gap:10px;flex-wrap:wrap}
 .daytot .p{color:var(--in)} .daytot .m{color:var(--out)}
 .list{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
@@ -256,8 +262,9 @@ footer{color:var(--muted)}
     <div class="field"><label for="fAmount">Monto</label><input class="amount num" id="fAmount" inputmode="decimal" autocomplete="off" placeholder="0"></div>
     <div class="grid2">
       <div class="field"><label for="fDate">Fecha</label><input type="date" id="fDate"></div>
-      <div class="field"><label for="fCuenta">Sale de / entra a</label><select id="fCuenta"></select></div>
+      <div class="field"><label for="fMon">Moneda</label><select id="fMon"><option value="ARS">Pesos</option><option value="USD">Dólares (US$)</option></select></div>
     </div>
+    <div class="field"><label for="fCuenta">Sale de / entra a</label><select id="fCuenta"></select></div>
     <div class="grid2">
       <div class="field"><label for="fCat">Categoría</label><select id="fCat"></select></div>
       <div class="field"><label for="fCasa">Casa</label><select id="fCasa"></select></div>
@@ -265,6 +272,26 @@ footer{color:var(--muted)}
     <div class="field"><label for="fNote">Detalle (opcional)</label><input id="fNote" maxlength="120" placeholder="Ej.: farmacia del barrio"></div>
     <p class="err" id="fErr" hidden></p>
     <div class="btns"><button type="submit" class="btn primary" id="fSave">Guardar</button><button type="button" class="btn" id="fCancel">Cancelar</button></div>
+  </form>
+
+  <form class="card entry cx" id="cxForm" hidden novalidate>
+    <h3 id="cxTitle">Cambio de dólares</h3>
+    <div class="field"><label for="cxDir">¿Qué se hizo?</label><select id="cxDir"><option value="vende">Se vendieron dólares (entraron pesos)</option><option value="compra">Se compraron dólares (salieron pesos)</option></select></div>
+    <div class="grid2">
+      <div class="field"><label for="cxUsd">Dólares (US$)</label><input class="amount num" id="cxUsd" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+      <div class="field"><label for="cxCot">Cotización (pesos por dólar)</label><input class="amount num" id="cxCot" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+    </div>
+    <p class="cxcalc num" id="cxCalc">Escriban los dólares y la cotización.</p>
+    <div class="grid2">
+      <div class="field"><label for="cxDate">Fecha</label><input type="date" id="cxDate"></div>
+      <div class="field"><label for="cxNote">Detalle (opcional)</label><input id="cxNote" maxlength="120" placeholder="Ej.: cueva, banco, blue"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label for="cxUsdAcc">Cuenta de los dólares</label><select id="cxUsdAcc"></select></div>
+      <div class="field"><label for="cxArsAcc">Cuenta de los pesos</label><select id="cxArsAcc"></select></div>
+    </div>
+    <p class="err" id="cxErr" hidden></p>
+    <div class="btns"><button type="submit" class="btn primary" id="cxSave">Guardar cambio</button><button type="button" class="btn" id="cxCancel">Cancelar</button></div>
   </form>
 
   <!-- INICIO -->
@@ -277,7 +304,9 @@ footer{color:var(--muted)}
     <div class="actions">
       <button type="button" class="big in" id="addIn"><span>+</span> Anotar ingreso</button>
       <button type="button" class="big out" id="addOut"><span>−</span> Anotar gasto</button>
+      <button type="button" class="big cx" id="addCx"><span>⇄</span> Cambio de dólares</button>
     </div>
+    <section class="card usd" id="usdCard"><div><div class="lbl">Dólares ahorrados</div><div class="val num" id="usdTot">US$ 0</div><small class="hint" id="usdSub"></small></div></section>
     <section class="card" id="catsCard" hidden><h3>¿En qué se gastó?</h3><div class="bars out" id="catList"></div></section>
     <section id="days" class="col"></section>
   </section>
@@ -361,9 +390,9 @@ footer{color:var(--muted)}
         <div class="field" data-for="banco"><label for="aNumero">N° de cuenta o CBU</label><input id="aNumero" maxlength="40" class="num"></div>
         <div class="field" data-for="credito"><label for="aMarca">Marca</label><select id="aMarca"><option>Visa</option><option>Mastercard</option><option>American Express</option><option>Cabal</option><option>Naranja</option><option>Otra</option></select></div>
       </div>
-      <div class="grid2" data-for="banco">
-        <div class="field"><label for="aDebito">Tarjeta de débito (últimos 4)</label><input id="aDebito" maxlength="4" inputmode="numeric" class="num" placeholder="1234"></div>
-        <div class="field"><label for="aMon">Moneda</label><select id="aMon"><option value="ARS">Pesos</option><option value="USD">Dólares</option></select></div>
+      <div class="grid2" data-for="banco efectivo">
+        <div class="field" data-for="banco"><label for="aDebito">Tarjeta de débito (últimos 4)</label><input id="aDebito" maxlength="4" inputmode="numeric" class="num" placeholder="1234"></div>
+        <div class="field" data-for="banco efectivo"><label for="aMon">Moneda</label><select id="aMon"><option value="ARS">Pesos</option><option value="USD">Dólares</option></select></div>
       </div>
       <div class="grid2" data-for="credito">
         <div class="field"><label for="aUlt">Últimos 4 números</label><input id="aUlt" maxlength="4" inputmode="numeric" class="num" placeholder="1234"></div>
@@ -429,14 +458,16 @@ function parseAmount(s){
 }
 const acc = id => cuentas.find(c=>c.id===id);
 const casa = id => casas.find(c=>c.id===id);
-const curOf = r => (acc(r.cuenta)||{}).moneda==="USD" ? "USD" : "ARS";
+const curOf = r => r.moneda ? r.moneda : (acc(r.cuenta)||{}).moneda==="USD" ? "USD" : "ARS";
 const cardLabel = c => `${c.marca||"Tarjeta"} ···· ${c.ultimos4||"----"}${c.banco?" · "+c.banco:""}`;
 const cajas = () => cuentas.filter(c=>c.tipo!=="credito").sort((a,b)=>(a.orden||0)-(b.orden||0));
 const tarjetas = () => cuentas.filter(c=>c.tipo==="credito").sort((a,b)=>(a.orden||0)-(b.orden||0));
 
 /* ---------- cálculos ---------- */
 const monthMovs = key => movs.filter(r=>r.fecha.startsWith(key));
-function sums(list, cur="ARS"){ let i=0,o=0; for(const r of list){ if(curOf(r)!==cur) continue; if(r.tipo==="in") i+=r.monto; else o+=r.monto; } return {i,o,r:i-o}; }
+// Un cambio de dólares no es ingreso ni gasto: mueve plata de una moneda a otra. Va aparte (cx) y solo cuenta para los saldos.
+function sums(list, cur="ARS"){ let i=0,o=0,cx=0; for(const r of list){ if(curOf(r)!==cur) continue; if(r.cambio) cx += r.tipo==="in"? r.monto : -r.monto; else if(r.tipo==="in") i+=r.monto; else o+=r.monto; } return {i,o,r:i-o,cx}; }
+function usdAhorrados(){ let t=0; for(const c of cajas()) if(c.moneda==="USD") t+=accBalance(c); for(const r of movs) if(!acc(r.cuenta) && curOf(r)==="USD") t += r.tipo==="in"? r.monto : -r.monto; return t; }
 function accBalance(a){ let s=a.saldoInicial||0; for(const r of movs){ if(r.cuenta!==a.id || (a.desde && r.fecha<a.desde)) continue; s += r.tipo==="in"? r.monto : -r.monto; } return s; }
 const baseArs = () => cajas().filter(c=>c.moneda!=="USD").reduce((t,c)=>t+(c.saldoInicial||0),0);
 function dueThisMonth(c, key){
@@ -465,7 +496,7 @@ function flowMonths(){
   const out=[]; for(let k=11;k>=0;k--){ const d=new Date(view.y, view.m-k, 1); out.push({y:d.getFullYear(), m:d.getMonth()}); }
   const first=mk(out[0].y,out[0].m); let a=baseArs();
   for(const r of movs) if(r.fecha.slice(0,7)<first && curOf(r)==="ARS") a += r.tipo==="in"? r.monto : -r.monto;
-  for(const o of out){ const s=sums(monthMovs(mk(o.y,o.m))); Object.assign(o,s); a+=s.r; o.acc=a; o.o=s.o; o.i=s.i; }
+  for(const o of out){ const s=sums(monthMovs(mk(o.y,o.m))); Object.assign(o,s); a+=s.r+s.cx; o.acc=a; o.o=s.o; o.i=s.i; }
   return out;
 }
 
@@ -485,7 +516,7 @@ function bars(container, entries){
     row.append(el("span",null,c), el("span","num",money(v)), bar); return row;
   }) : [el("p","hint","Nada anotado.")]));
 }
-function groupSum(list, tipo, keyFn){ const o={}; for(const r of list) if(r.tipo===tipo && curOf(r)==="ARS"){ const k=keyFn(r); if(k) o[k]=(o[k]||0)+r.monto; } return Object.entries(o).sort((a,b)=>b[1]-a[1]); }
+function groupSum(list, tipo, keyFn){ const o={}; for(const r of list) if(r.tipo===tipo && !r.cambio && curOf(r)==="ARS"){ const k=keyFn(r); if(k) o[k]=(o[k]||0)+r.monto; } return Object.entries(o).sort((a,b)=>b[1]-a[1]); }
 const tile = (cls,l,v,sm) => { const d=el("div","tile "+cls); d.append(el("div","lbl",l), el("div","val num",v)); if(sm) d.append(el("small",null,sm)); return d; };
 function confirmTools(key, label, onYes){
   const t=el("div","tools");
@@ -503,6 +534,10 @@ function renderInicio(){
   $("tIn").textContent=money(s.i); $("tOut").textContent=money(s.o); $("tBal").textContent=signed(s.r);
   $("tInUsd").textContent = u.i? "+ "+money(u.i,"USD") : "";
   $("tOutUsd").textContent = u.o? "+ "+money(u.o,"USD") : "";
+  const usd=usdAhorrados(), lastCx=movs.filter(r=>r.cambio&&r.cotizacion).sort((a,b)=>(b.fecha+b.creado).localeCompare(a.fecha+a.creado))[0];
+  $("usdTot").textContent=signed(usd,"USD");
+  const hasUsdAcc=cajas().some(c=>c.moneda==="USD");
+  $("usdSub").textContent=[lastCx? `Último cambio: ${money(lastCx.cotizacion)} por dólar, el ${dmy(lastCx.fecha)}` : "", hasUsdAcc? "" : "Para llevar el saldo, creen en Cuentas una cuenta en dólares (efectivo o banco)."].filter(Boolean).join(" · ");
   const pend=pagosDelMes(key).filter(p=>p.st.estado!=="pagado");
   $("tPend").textContent = pend.length? `Faltan ${pend.length} pagos (${money(pend.reduce((t,p)=>t+p.monto,0))})` : "";
   const cats=groupSum(list,"out",r=>r.categoria); $("catsCard").hidden=!cats.length; bars($("catList"),cats);
@@ -512,7 +547,7 @@ function renderInicio(){
   box.replaceChildren(...Object.keys(byDay).sort().reverse().map(day=>{
     const items=byDay[day].sort((a,b)=>b.creado.localeCompare(a.creado)), d=sums(items);
     const sec=el("div","day"), head=el("div","dayhead"), [y,m,dd]=day.split("-").map(Number);
-    head.append(el("h3",null,(day===todayStr()?"Hoy, ":"")+new Date(y,m-1,dd).toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"})));
+    head.append(el("h3",null,((day===todayStr()?"hoy, ":"")+new Date(y,m-1,dd).toLocaleDateString("es-AR",{weekday:"long",day:"numeric",month:"long"})).replace(/^./,c=>c.toUpperCase())));
     const tot=el("div","daytot num"); if(d.i) tot.append(el("span","p","+ "+money(d.i))); if(d.o) tot.append(el("span","m","− "+money(d.o))); head.append(tot);
     const lst=el("div","list"); for(const r of items) lst.append(itemEl(r));
     sec.append(head,lst); return sec;
@@ -521,17 +556,17 @@ function renderInicio(){
 function itemEl(r){
   const e=el("div","item"), left=el("div");
   left.append(el("div","what",r.categoria||"Sin categoría"));
-  const sub=[r.nota, r.casa&&casa(r.casa)? casa(r.casa).nombre : ""].filter(Boolean).join(" · ");
+  const sub=[r.cambio&&r.cotizacion? "a "+money(r.cotizacion)+" por dólar" : "", r.nota, r.casa&&casa(r.casa)? casa(r.casa).nombre : ""].filter(Boolean).join(" · ");
   if(sub) left.append(el("div","note",sub));
   const meta=el("div","meta"), bits=[];
   if(acc(r.cuenta)) bits.push(acc(r.cuenta).nombre);
   if(r.autor) bits.push("anotó "+(names[r.autor]||"un hermano"));
   meta.append(el("span",null,bits.join(" · ")));
   if(canWrite){
-    if(confirming===r.id) meta.append(confirmTools(r.id,"Borrar",()=>removeDoc("movimientos",r.id)));
-    else { const t=el("div","tools"); t.append(btn("link","Corregir",()=>openForm(r.tipo,{row:r})), btn("link danger","Borrar",()=>{confirming=r.id;render();})); meta.append(t); }
+    if(confirming===r.id) meta.append(confirmTools(r.id,"Borrar",()=> r.cambio? removeCambio(r.cambio) : removeDoc("movimientos",r.id)));
+    else { const t=el("div","tools"); t.append(btn("link","Corregir",()=> r.cambio? openCambio(r.cambio) : openForm(r.tipo,{row:r})), btn("link danger","Borrar",()=>{confirming=r.id;render();})); meta.append(t); }
   }
-  e.append(left, el("div","amt num "+r.tipo,(r.tipo==="in"?"+ ":"− ")+money(r.monto,curOf(r))), meta); return e;
+  e.append(left, el("div","amt num "+(r.cambio?"gold":r.tipo),(r.tipo==="in"?"+ ":"− ")+money(r.monto,curOf(r))), meta); return e;
 }
 
 function renderFlujo(){
@@ -706,7 +741,7 @@ function fillSelect(sel, opts, value){
   if(value!=null && value!=="" && !opts.some(o=>o[0]===value)){ const o=el("option",null,value); o.value=value; sel.prepend(o); }
   if(value!=null) sel.value=value;
 }
-const cajaOptions = () => [["","Sin especificar"], ...cajas().map(c=>[c.id, c.nombre+(c.moneda==="USD"?" (US$)":"")])];
+const cajaOptions = cur => [["","Sin especificar"], ...cajas().filter(c=>!cur || (c.moneda==="USD")===(cur==="USD")).map(c=>[c.id, c.nombre+(c.moneda==="USD"?" (US$)":"")])];
 const casaOptions = (none="No es de una casa") => [["",none], ...casas.map(h=>[h.id,h.nombre])];
 const showErr=(id,msg)=>{ const e=$(id); e.textContent=msg; e.hidden=false; };
 function writeMsg(e){
@@ -717,12 +752,14 @@ function writeMsg(e){
 
 function openForm(tipo, {row=null, comp=null, res=null}={}){
   form={tipo, editId:row?row.id:null, compromiso: row? row.compromiso : comp? comp.id : "", resumen: row? row.resumen : res? res.id : ""};
+  $("cxForm").hidden=true; cxEdit=null;
   const f=$("form"); f.hidden=false; f.className="card entry "+tipo;
   const card=res? acc(res.tarjeta) : null;
   $("formTitle").textContent = row? "Corregir "+(tipo==="in"?"ingreso":"gasto") : comp? "Pagar: "+comp.rubro+(comp.empresa?" · "+comp.empresa:"") : res? "Pagar resumen "+(card?cardLabel(card):"") : "Nuevo "+(tipo==="in"?"ingreso":"gasto");
   const key=mk(view.y,view.m), now=todayStr();
   fillSelect($("fCat"), CATS[tipo].map(c=>[c,c]), row? row.categoria : comp? comp.rubro : res? "Tarjeta de crédito (resumen)" : CATS[tipo][0]);
-  fillSelect($("fCuenta"), cajaOptions(), row? row.cuenta : card&&card.pagaDesde? card.pagaDesde : "");
+  $("fMon").value = row? curOf(row) : "ARS"; $("fMon").disabled = !!(comp||res||(row&&(row.compromiso||row.resumen)));
+  fillSelect($("fCuenta"), cajaOptions($("fMon").value), row? row.cuenta : card&&card.pagaDesde? card.pagaDesde : "");
   fillSelect($("fCasa"), casaOptions(), row? row.casa : comp? comp.casa : "");
   $("fAmount").value = row? fmt.format(row.monto) : comp&&comp.monto? fmt.format(comp.monto) : res? fmt.format(res.total||0) : "";
   $("fDate").value = row? row.fecha : (comp||res)? now : (key===now.slice(0,7)? now : key+"-01");
@@ -737,7 +774,7 @@ async function saveMov(ev){
   const monto=parseAmount($("fAmount").value);
   if(!(monto>0)) return showErr("fErr","Escriban un monto mayor que cero, por ejemplo 15000 o 15.000,50.");
   const fecha=$("fDate").value; if(!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return showErr("fErr","Elijan la fecha del movimiento.");
-  const body={tipo:form.tipo, monto, fecha, categoria:$("fCat").value, nota:$("fNote").value.trim().slice(0,120), cuenta:$("fCuenta").value||"", casa:$("fCasa").value||"", compromiso:form.compromiso||"", resumen:form.resumen||""};
+  const body={tipo:form.tipo, monto, fecha, categoria:$("fCat").value, nota:$("fNote").value.trim().slice(0,120), cuenta:$("fCuenta").value||"", casa:$("fCasa").value||"", moneda:$("fMon").value==="USD"?"USD":"ARS", compromiso:form.compromiso||"", resumen:form.resumen||""};
   const b=$("fSave"); b.disabled=true; b.textContent="Guardando…";
   try{
     if(form.editId) await db.collection("movimientos").doc(form.editId).update(body);
@@ -747,6 +784,57 @@ async function saveMov(ev){
   }catch(e){ showErr("fErr",writeMsg(e)); }
   finally{ b.disabled=false; b.textContent="Guardar"; }
 }
+/* ---------- cambio de dólares: dos movimientos atados por el mismo "cambio" ---------- */
+let cxEdit=null;
+const cxPair = id => movs.filter(r=>r.cambio===id);
+function cxCalc(){
+  const u=parseAmount($("cxUsd").value), c=parseAmount($("cxCot").value);
+  $("cxCalc").textContent = u>0&&c>0? `${money(u,"USD")} × ${money(c)} = ${money(Math.round(u*c*100)/100)} ${$("cxDir").value==="vende"?"que entran":"que salen"}` : "Escriban los dólares y la cotización.";
+}
+function openCambio(id){
+  closeForm(); cxEdit=id||null; const f=$("cxForm"); f.hidden=false;
+  const pair=id? cxPair(id) : [], u=pair.find(r=>curOf(r)==="USD"), a=pair.find(r=>curOf(r)==="ARS");
+  $("cxTitle").textContent=id? "Corregir cambio de dólares" : "Cambio de dólares";
+  $("cxDir").value = u&&u.tipo==="in"? "compra" : "vende";
+  $("cxUsd").value = u? fmt.format(u.monto) : ""; $("cxCot").value = (u||a)&&(u||a).cotizacion? fmt.format((u||a).cotizacion) : "";
+  const key=mk(view.y,view.m), now=todayStr();
+  $("cxDate").value = (u||a)? (u||a).fecha : (key===now.slice(0,7)? now : key+"-01");
+  $("cxNote").value = (u||a)? (u||a).nota : "";
+  fillSelect($("cxUsdAcc"), cajaOptions("USD"), u? u.cuenta : (cajas().find(c=>c.moneda==="USD")||{}).id||"");
+  fillSelect($("cxArsAcc"), cajaOptions("ARS"), a? a.cuenta : "");
+  $("cxErr").hidden=true; cxCalc();
+  f.scrollIntoView({behavior:"smooth",block:"start"}); $("cxUsd").focus({preventScroll:true});
+}
+async function saveCambio(ev){
+  ev.preventDefault();
+  if(!db) return showErr("cxErr","No hay conexión con los datos compartidos. Recarguen la página.");
+  const usd=parseAmount($("cxUsd").value), cot=parseAmount($("cxCot").value);
+  if(!(usd>0)) return showErr("cxErr","Escriban cuántos dólares, por ejemplo 500.");
+  if(!(cot>0)) return showErr("cxErr","Escriban la cotización, por ejemplo 1.230.");
+  const fecha=$("cxDate").value; if(!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return showErr("cxErr","Elijan la fecha del cambio.");
+  const vende=$("cxDir").value==="vende", ars=Math.round(usd*cot*100)/100, nota=$("cxNote").value.trim().slice(0,120);
+  const cat = vende? "Venta de dólares" : "Compra de dólares";
+  const common={fecha, categoria:cat, nota, casa:"", compromiso:"", resumen:"", cotizacion:cot};
+  const bU={...common, tipo:vende?"out":"in", moneda:"USD", monto:usd, cuenta:$("cxUsdAcc").value||""};
+  const bA={...common, tipo:vende?"in":"out", moneda:"ARS", monto:ars, cuenta:$("cxArsAcc").value||""};
+  const b=$("cxSave"); b.disabled=true; b.textContent="Guardando…";
+  try{
+    const col=db.collection("movimientos");
+    if(cxEdit){
+      const pair=cxPair(cxEdit), u=pair.find(r=>curOf(r)==="USD"), a=pair.find(r=>curOf(r)==="ARS");
+      if(u) await col.doc(u.id).update(bU); else await col.add({...bU, cambio:cxEdit, autor:myId||null, creado:new Date().toISOString()});
+      if(a) await col.doc(a.id).update(bA); else await col.add({...bA, cambio:cxEdit, autor:myId||null, creado:new Date().toISOString()});
+    } else {
+      const id=uid(), creado=new Date().toISOString();
+      await col.add({...bU, cambio:id, autor:myId||null, creado});
+      await col.add({...bA, cambio:id, autor:myId||null, creado});
+    }
+    if(tab==="inicio"){ const [y,m]=fecha.split("-").map(Number); view={y,m:m-1}; }
+    $("cxForm").hidden=true; cxEdit=null; render();
+  }catch(e){ showErr("cxErr",writeMsg(e)); }
+  finally{ b.disabled=false; b.textContent="Guardar cambio"; }
+}
+async function removeCambio(id){ try{ for(const r of cxPair(id)) await db.collection("movimientos").doc(r.id).delete(); }catch(e){} confirming=null; render(); }
 async function removeDoc(col,id){ try{ await db.collection(col).doc(id).delete(); }catch(e){} confirming=null; render(); }
 async function removeComp(id){ try{ await db.collection("compromisos").doc(id).update({activo:false}); }catch(e){} confirming=null; render(); }
 
@@ -833,7 +921,7 @@ async function saveAcc(ev){
 async function exportXlsx(){
   if(!window.XLSX || !downloads) return;
   const wb=XLSX.utils.book_new(), add=(rows,name,empty)=>XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows.length?rows:[empty]), name);
-  add([...movs].sort((a,b)=>a.fecha.localeCompare(b.fecha)).map(r=>({Fecha:r.fecha, Tipo:r.tipo==="in"?"Ingreso":"Gasto", Categoría:r.categoria, Casa:(casa(r.casa)||{}).nombre||"", Detalle:r.nota, Cuenta:(acc(r.cuenta)||{}).nombre||"", Moneda:curOf(r), Monto:r.tipo==="in"?r.monto:-r.monto, "Anotó":names[r.autor]||""})), "Movimientos", {Fecha:""});
+  add([...movs].sort((a,b)=>a.fecha.localeCompare(b.fecha)).map(r=>({Fecha:r.fecha, Tipo:r.cambio?"Cambio":r.tipo==="in"?"Ingreso":"Gasto", Categoría:r.categoria, Casa:(casa(r.casa)||{}).nombre||"", Detalle:r.nota, Cuenta:(acc(r.cuenta)||{}).nombre||"", Moneda:curOf(r), Monto:r.tipo==="in"?r.monto:-r.monto, Cotización:r.cotizacion||"", "Anotó":names[r.autor]||""})), "Movimientos", {Fecha:""});
   add(flowMonths().map(o=>({Mes:mk(o.y,o.m), Ingresos:o.i, Gastos:o.o, Resultado:o.r, "Saldo acumulado":o.acc})), "Flujo", {Mes:""});
   const key=mk(view.y,view.m);
   add(pagosDelMes(key).map(p=>p.kind==="comp"? {Pago:p.c.rubro, Casa:(casa(p.c.casa)||{}).nombre||"General", Empresa:p.c.empresa, "N° cliente/partida":p.c.numero, "Vence día":p.c.dia||"", Monto:p.monto, Estado:p.st.estado} : {Pago:"Resumen "+cardLabel(acc(p.r.tarjeta)||{}), Casa:"", Empresa:"", "N° cliente/partida":"", "Vence día":p.dia, Monto:p.monto, Estado:p.st.estado}), "Pagos "+key, {Pago:""});
@@ -881,7 +969,7 @@ function buildPdf(){
     {columnStyles:{5:{halign:"right"}}});
   section("Movimientos del mes");
   table(["Fecha","Tipo","Categoría","Casa","Detalle","Cuenta","Monto"],
-    [...list].sort((a,b)=>a.fecha.localeCompare(b.fecha)).map(r=>[dmy(r.fecha).slice(0,5), r.tipo==="in"?"Ingreso":"Gasto", r.categoria, (casa(r.casa)||{}).nombre||"", r.nota, (acc(r.cuenta)||{}).nombre||"", (r.tipo==="in"?"+ ":"- ")+money(r.monto,curOf(r))]),
+    [...list].sort((a,b)=>a.fecha.localeCompare(b.fecha)).map(r=>[dmy(r.fecha).slice(0,5), r.cambio?"Cambio":r.tipo==="in"?"Ingreso":"Gasto", r.categoria, (casa(r.casa)||{}).nombre||"", [r.cotizacion?"a "+money(r.cotizacion):"", r.nota].filter(Boolean).join(" · "), (acc(r.cuenta)||{}).nombre||"", (r.tipo==="in"?"+ ":"- ")+money(r.monto,curOf(r))]),
     {columnStyles:{6:{halign:"right"}}});
   const byDay={}; for(const r of list){ const d=byDay[r.fecha] ||= {i:0,o:0}; if(curOf(r)!=="ARS") continue; if(r.tipo==="in") d.i+=r.monto; else d.o+=r.monto; }
   section("Totales por día");
@@ -926,7 +1014,10 @@ function setTab(t){ tab=t; confirming=null; try{ history.replaceState(null,"","#
 for(const b of document.querySelectorAll("nav.tabs button")) b.onclick=()=>setTab(b.dataset.tab);
 $("prev").onclick=()=>{ view.m--; if(view.m<0){view.m=11;view.y--;} confirming=null; render(); };
 $("next").onclick=()=>{ view.m++; if(view.m>11){view.m=0;view.y++;} confirming=null; render(); };
-$("addIn").onclick=()=>openForm("in"); $("addOut").onclick=()=>openForm("out");
+$("addIn").onclick=()=>openForm("in"); $("addOut").onclick=()=>openForm("out"); $("addCx").onclick=()=>openCambio(null);
+$("fMon").onchange=()=>{ const m=$("fMon").value; fillSelect($("fCuenta"), cajaOptions(m), m==="USD"? (cajas().find(c=>c.moneda==="USD")||{}).id||"" : ""); };
+$("cxCancel").onclick=()=>{$("cxForm").hidden=true; cxEdit=null;}; $("cxForm").addEventListener("submit",saveCambio);
+for(const id of ["cxUsd","cxCot","cxDir"]) $(id).addEventListener("input",cxCalc);
 $("fCancel").onclick=closeForm; $("form").addEventListener("submit",saveMov);
 $("compNew").onclick=()=>openComp(null); $("cCancel").onclick=()=>{$("compForm").hidden=true;}; $("compForm").addEventListener("submit",saveComp);
 $("casaNew").onclick=()=>openCasa(null); $("hCancel").onclick=()=>{$("casaForm").hidden=true;}; $("casaForm").addEventListener("submit",saveCasa);
@@ -1017,7 +1108,7 @@ function start(session){
   const onErr=()=>{ const s=$("status"); s.hidden=false; s.textContent="Se cortó la conexión con los datos. Recarguen la página."; };
   const S=v=>String(v??"");
   db.collection("movimientos").orderBy("fecha","desc").limit(1000).onSnapshot(snap=>{
-    movs=snap.docs.map(d=>{const x=d.data()||{}; return {id:d.id, tipo:x.tipo==="out"?"out":"in", monto:Number(x.monto)||0, fecha:S(x.fecha), categoria:S(x.categoria), nota:S(x.nota), cuenta:S(x.cuenta), casa:S(x.casa), compromiso:S(x.compromiso), resumen:S(x.resumen), autor:x.autor||null, creado:S(x.creado)};});
+    movs=snap.docs.map(d=>{const x=d.data()||{}; return {id:d.id, tipo:x.tipo==="out"?"out":"in", monto:Number(x.monto)||0, fecha:S(x.fecha), categoria:S(x.categoria), nota:S(x.nota), cuenta:S(x.cuenta), casa:S(x.casa), compromiso:S(x.compromiso), resumen:S(x.resumen), moneda:x.moneda==="USD"?"USD":x.moneda==="ARS"?"ARS":"", cambio:S(x.cambio), cotizacion:Number(x.cotizacion)||0, autor:x.autor||null, creado:S(x.creado)};});
     loaded=true; render(); resolveNames();
   }, onErr);
   db.collection("cuentas").onSnapshot(snap=>{
