@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cuentas de Modesta</title>
-<meta name="theme-color" content="#6d1a2c">
+<meta name="theme-color" content="#2b0b13">
 <link rel="manifest" href="/manifest.json">
 <link rel="icon" href="/icon-192.png">
 <link rel="apple-touch-icon" href="/icon-192.png">
@@ -13,14 +13,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Cormorant+Garamond:wght@600;700&display=swap">
 <style>
-/* Layout: libro de caja familiar en una columna; banda borravino con dorado arriba, contenido sobre fondo claro para leer cómodo; pestañas Inicio / Flujo / Pagos / Casas / Cuentas. Un solo tema claro, elegido a propósito. */
+/* Layout: libro de caja familiar en una columna; tarjeta crema arriba con moneda dorada, contenido sobre borravino profundo con bordes dorados; pestañas Inicio / Flujo / Pagos / Casas / Cuentas. Un solo tema, elegido a propósito. */
 :root{
-  --bg:#f6f2f2; --surface:#ffffff; --surface2:#f2e9ea; --ink:#2a1519; --muted:#6c575a; --line:#e5d7d9;
-  --wine:#6d1a2c; --wine-deep:#4f1220; --gold:#8a6a1f; --gold-bright:#dcbc6a; --gold-ink:#ffffff;
-  --in:#1d7f4e; --in-soft:#e0f1e7; --out:#b23a3a; --out-soft:#f8e2e0; --warn:#8a6000; --warn-soft:#fbefd0;
+  --bg:#2b0b13; --surface:#4a1521; --surface2:#5c1d2b; --ink:#f7ecd6; --muted:#dcc6a6; --line:rgba(220,188,106,.42);
+  --wine:#7a2032; --wine-deep:#3d0d18; --accent:#e9cd84; --gold:#e9cd84; --gold-bright:#e2c172; --gold-ink:#3d0d18;
+  --cream:#fbf3e2; --cream2:#ecdcb8;
+  --in:#9ee0ad; --in-bg:#2f7d4d; --in-soft:rgba(158,224,173,.16); --out:#ff9b92; --out-bg:#b5443f; --out-soft:rgba(255,155,146,.16); --warn:#f5cf73; --warn-soft:rgba(245,207,115,.16);
   --display:"Cormorant Garamond", Georgia, "Times New Roman", serif;
   --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
-  color-scheme:light;
+  color-scheme:dark;
 }
 
 *{box-sizing:border-box}
@@ -53,8 +54,8 @@ nav.tabs button{border:0;background:transparent;border-radius:10px;padding:10px 
 nav.tabs button[aria-selected="true"]{background:var(--wine);color:var(--gold-bright)}
 
 .month{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.month h2{color:var(--wine);font-size:1.6rem;text-align:center;flex:1}
-.month button{border:1px solid var(--line);background:var(--surface);width:46px;height:46px;border-radius:12px;font-size:1.4rem;color:var(--wine)}
+.month h2{color:var(--accent);font-size:1.6rem;text-align:center;flex:1}
+.month button{border:1px solid var(--line);background:var(--surface);width:46px;height:46px;border-radius:12px;font-size:1.4rem;color:var(--accent)}
 
 .totals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 @media (max-width:540px){.totals{grid-template-columns:1fr 1fr}.totals>:last-child{grid-column:1 / -1}}
@@ -67,11 +68,11 @@ nav.tabs button[aria-selected="true"]{background:var(--wine);color:var(--gold-br
 
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .big{border:0;border-radius:14px;padding:15px 10px;font-size:1.06rem;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;color:#ffffff}
-.big.in{background:var(--in)} .big.out{background:var(--out)}
+.big.in{background:linear-gradient(180deg,#3c8f5c,var(--in-bg))} .big.out{background:linear-gradient(180deg,#c95650,var(--out-bg))}
 .big span{font-size:1.45rem;line-height:1}
 
 .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
-.card h3{font-size:1.38rem;color:var(--wine)}
+.card h3{font-size:1.38rem;color:var(--accent)}
 .headrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .hint{color:var(--muted);font-size:.9rem;margin:0}
 form.entry{border-width:2px}
@@ -110,13 +111,13 @@ form.entry.in{border-color:var(--in)} form.entry.out{border-color:var(--out)} fo
 .item .amt.in{color:var(--in)} .item .amt.out{color:var(--out)} .item .amt.gold{color:var(--gold)}
 .item .meta{grid-column:1 / -1;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}
 .tools{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
-.link{border:0;background:transparent;color:var(--wine);font-weight:700;padding:6px 8px;border-radius:8px;min-height:36px}
+.link{border:0;background:transparent;color:var(--accent);font-weight:700;padding:6px 8px;border-radius:8px;min-height:36px}
 .link.danger{color:var(--out)}
 .chip{display:inline-block;border-radius:999px;padding:2px 10px;font-size:.78rem;font-weight:700;border:1px solid var(--line);color:var(--muted)}
 .chip.ok{background:var(--in-soft);color:var(--in);border-color:transparent}
 .chip.late{background:var(--out-soft);color:var(--out);border-color:transparent}
 .chip.soon{background:var(--warn-soft);color:var(--warn);border-color:transparent}
-.group{font-family:var(--display);font-size:1.2rem;color:var(--wine);margin:4px 0 -4px;padding:0 2px}
+.group{font-family:var(--display);font-size:1.2rem;color:var(--accent);margin:4px 0 -4px;padding:0 2px}
 .idbox{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surface2);border-left:4px solid var(--gold-bright);border-radius:12px;padding:10px 12px}
 .idbox b{font-size:1.15rem;letter-spacing:.03em;overflow-wrap:anywhere}
 
@@ -134,7 +135,7 @@ svg.chart text{fill:var(--muted);font-family:var(--body);font-size:11px}
 .acc{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:14px;border-top:1px solid var(--line)}
 .acc:first-child{border-top:0}
 .acc .name{font-weight:700;font-size:1.05rem;overflow-wrap:anywhere}
-.acc .saldo{font-weight:700;font-size:1.22rem;text-align:right;color:var(--wine)}
+.acc .saldo{font-weight:700;font-size:1.22rem;text-align:right;color:var(--accent)}
 .acc .meta{grid-column:1 / -1;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:.84rem;color:var(--muted);align-items:center}
 .acc .sub{grid-column:1 / -1;margin-top:8px}
 footer{color:var(--muted);font-size:.84rem;text-align:center}
@@ -147,6 +148,50 @@ footer{color:var(--muted);font-size:.84rem;text-align:center}
 .login .body{padding:20px;display:flex;flex-direction:column;gap:14px}
 .who{color:#ead9c0;font-size:.85rem;align-self:center}
 @media (prefers-reduced-motion:no-preference){form.entry{animation:rise .18s ease-out}@keyframes rise{from{transform:translateY(-6px);opacity:.6}}}
+
+/* Borravino y dorado, como la tarjeta del teléfono */
+body{background:radial-gradient(120% 70% at 50% 0%,#5a1626 0%,#3a0e19 45%,var(--bg) 100%) fixed var(--bg)}
+body::before{background:#3a0e19}
+header.top{background:linear-gradient(180deg,var(--cream),var(--cream2));border:1px solid var(--gold-bright);color:var(--wine-deep);box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 1px 0 #fff}
+header.top h1{color:var(--wine-deep)}
+header.top p{color:#5b3a2c}
+header.top .btn-xls{border-color:#8a6a2a;color:var(--wine-deep)}
+header.top .who{color:var(--wine-deep);font-weight:700}
+.mark{border-radius:50%;width:56px;height:56px;background:radial-gradient(circle at 35% 30%,#fbe7a6,#d7a940 45%,#9a6d1a 100%);border:2px solid #f3d98c;color:#4a2a06;box-shadow:0 4px 10px rgba(0,0,0,.35),inset 0 -3px 6px rgba(0,0,0,.25);font-size:2rem}
+nav.tabs{background:rgba(61,13,24,.92);border-color:var(--line);backdrop-filter:blur(6px)}
+nav.tabs button{color:var(--ink)}
+nav.tabs button[aria-selected="true"]{background:var(--wine);color:var(--accent);box-shadow:inset 3px 0 0 var(--gold-bright)}
+.month h2{background:linear-gradient(180deg,var(--cream),var(--cream2));color:var(--wine-deep);border-radius:14px;padding:6px 10px;box-shadow:0 6px 18px rgba(0,0,0,.3)}
+.month button{border-color:var(--gold-bright);background:transparent}
+.tile,.card,.list,.notice{background:linear-gradient(180deg,rgba(92,29,43,.9),rgba(64,17,28,.9));border-color:var(--line);box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.notice{border-style:solid;color:var(--ink);text-align:center}
+.card .list{background:transparent;box-shadow:none}
+.tile.in{border-top:3px solid #7fc790} .tile.out{border-top:3px solid #e0716a}
+.tile.bal{background:linear-gradient(180deg,#6a1c2d,#4a1220);border-color:var(--gold-bright)} .tile.bal .val{color:var(--accent)} .tile.bal .lbl,.tile.bal small{color:var(--muted)}
+.big{border:1px solid var(--gold-bright);box-shadow:0 6px 16px rgba(0,0,0,.3)}
+.btn{background:var(--surface2);border-color:var(--line)}
+.btn.primary{background:linear-gradient(180deg,#e9cd84,#c9a24e);border-color:#f0d892;color:var(--wine-deep)}
+.field input,.field select{background:rgba(30,6,12,.55);border-color:var(--line)}
+.field input::placeholder{color:#a88f7a}
+.idbox{background:rgba(0,0,0,.18)}
+.item .amt.gold{color:var(--accent)}
+.login form{background:linear-gradient(180deg,rgba(92,29,43,.95),rgba(64,17,28,.95));box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.login .band{background:linear-gradient(180deg,var(--cream),var(--cream2))}
+.login .band h1{color:var(--wine-deep)} .login .band p{color:#5b3a2c}
+footer{color:var(--muted)}
+/* Pantallas grandes: más ancho y letra más grande, para que no quede una tira chica en el medio */
+@media (min-width:1100px){
+  body{font-size:clamp(18px, calc(10px + .55vw), 23px)}
+  .wrap{max-width:min(1400px, 88vw);gap:22px;padding-block:28px 64px}
+  header.top{padding:22px 28px}
+  header.top h1{font-size:3rem}
+  .mark{width:72px;height:72px;font-size:2.6rem}
+  .month h2{font-size:2.2rem}
+  .month button{width:56px;height:56px}
+  .tile{padding:18px 22px} .tile .val{font-size:2rem}
+  .big{padding:20px 12px;font-size:1.25rem}
+  .card h3{font-size:1.7rem}
+}
 </style>
 </head>
 <body>
@@ -226,7 +271,7 @@ footer{color:var(--muted);font-size:.84rem;text-align:center}
   <section id="view-flujo" class="view col" hidden>
     <section class="card">
       <h3>Flujo de caja · últimos 12 meses</h3>
-      <div class="legend"><span><i style="background:var(--in)"></i>Ingresos</span><span><i style="background:var(--out)"></i>Gastos</span><span><i style="background:var(--wine)"></i>Saldo acumulado</span></div>
+      <div class="legend"><span><i style="background:var(--in)"></i>Ingresos</span><span><i style="background:var(--out)"></i>Gastos</span><span><i style="background:var(--accent)"></i>Saldo acumulado</span></div>
       <div class="scroll"><svg class="chart" id="chart" viewBox="0 0 720 260" width="100%" style="min-width:520px" role="img" aria-label="Ingresos, gastos y saldo acumulado por mes"></svg></div>
       <div class="scroll"><table class="flow num" id="flowTable"></table></div>
       <p class="hint">Montos en pesos. El saldo acumulado parte de los saldos iniciales del efectivo y los bancos en pesos y suma todo lo que entró y salió. Las compras con tarjeta de crédito cuentan cuando se paga el resumen.</p>
@@ -272,7 +317,7 @@ footer{color:var(--muted);font-size:.84rem;text-align:center}
 
   <!-- CASAS -->
   <section id="view-casas" class="view col" hidden>
-    <div class="headrow"><h3 style="font-size:1.5rem;color:var(--wine)">Casas de Modesta</h3><button type="button" class="btn small" id="casaNew">+ Nueva casa</button></div>
+    <div class="headrow"><h3 style="font-size:1.5rem;color:var(--accent)">Casas de Modesta</h3><button type="button" class="btn small" id="casaNew">+ Nueva casa</button></div>
     <form class="card entry neutral" id="casaForm" hidden novalidate>
       <h4 id="casaFormTitle" style="font-size:1.2rem">Nueva casa</h4>
       <div class="field"><label for="hNombre">Nombre corto</label><input id="hNombre" maxlength="60" placeholder="Ej.: Depto. Aristóbulo del Valle"></div>
@@ -289,7 +334,7 @@ footer{color:var(--muted);font-size:.84rem;text-align:center}
 
   <!-- CUENTAS -->
   <section id="view-cuentas" class="view col" hidden>
-    <div class="headrow"><h3 style="font-size:1.5rem;color:var(--wine)">Bancos, efectivo y tarjetas</h3><button type="button" class="btn small" id="accNew">+ Nueva cuenta o tarjeta</button></div>
+    <div class="headrow"><h3 style="font-size:1.5rem;color:var(--accent)">Bancos, efectivo y tarjetas</h3><button type="button" class="btn small" id="accNew">+ Nueva cuenta o tarjeta</button></div>
     <form class="card entry neutral" id="accForm" hidden novalidate>
       <h4 id="accFormTitle" style="font-size:1.2rem">Nueva cuenta</h4>
       <div class="grid2">
@@ -508,8 +553,8 @@ function drawChart(months){
     const tx=S("text",{x:cx,y:H-12,"text-anchor":"middle"}); tx.textContent=monthLabel(o.y,o.m,{month:"short"}).replace(".",""); svg.append(tx);
     pts.push([cx,y(o.acc)]);
   });
-  svg.append(S("polyline",{points:pts.map(p=>p.join(",")).join(" "),fill:"none",stroke:"var(--wine)","stroke-width":2.5,"stroke-linejoin":"round"}));
-  const lp=pts[pts.length-1]; svg.append(S("circle",{cx:lp[0],cy:lp[1],r:4.5,fill:"var(--wine)"}));
+  svg.append(S("polyline",{points:pts.map(p=>p.join(",")).join(" "),fill:"none",stroke:"var(--accent)","stroke-width":2.5,"stroke-linejoin":"round"}));
+  const lp=pts[pts.length-1]; svg.append(S("circle",{cx:lp[0],cy:lp[1],r:4.5,fill:"var(--accent)"}));
 }
 
 function pagoItem(p){
