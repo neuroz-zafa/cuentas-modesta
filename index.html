@@ -1043,7 +1043,16 @@ async function resolveNames(){
 const DOMINIO="cuentas-modesta.app"; // cada usuario se crea en Supabase como <usuario>@cuentas-modesta.app
 const NOMBRES={carlos:"Carlos José", alejandra:"María Alejandra", adrian:"Adrián"};
 const CFG=window.CONFIG||{};
-const sbc=(CFG.url && CFG.key && window.supabase)? window.supabase.createClient(CFG.url, CFG.key) : null;
+// La sesión se guarda también en memoria: algunos navegadores o antivirus borran el almacenamiento del sitio
+// apenas se escribe, y sin esto la base atendía como "sin usuario" y la app se veía vacía.
+const memSes={};
+const lsGet=k=>{ try{ return localStorage.getItem(k); }catch(e){ return null; } };
+const sesStore={
+  getItem:k=> k in memSes? memSes[k] : lsGet(k),
+  setItem:(k,v)=>{ memSes[k]=v; try{ localStorage.setItem(k,v); }catch(e){} },
+  removeItem:k=>{ delete memSes[k]; try{ localStorage.removeItem(k); }catch(e){} },
+};
+const sbc=(CFG.url && CFG.key && window.supabase)? window.supabase.createClient(CFG.url, CFG.key, {auth:{storage:sesStore}}) : null;
 function makeDb(){
   const subs={}, timers={};
   // Supabase devuelve como mucho 1000 filas por pedido: se piden de a 1000 hasta traer todas.
