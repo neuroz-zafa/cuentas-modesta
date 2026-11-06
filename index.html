@@ -546,7 +546,7 @@ function renderInicio(){
   const cats=groupSum(list,"out",r=>r.categoria); $("catsCard").hidden=!cats.length; bars($("catList"),cats);
   const byDay={}; for(const r of list) (byDay[r.fecha] ||= []).push(r);
   const box=$("days");
-  if(db && loaded && !list.length){ box.replaceChildren(el("p","notice", movs.length? "No hay movimientos anotados en este mes." : "Todavía no hay nada anotado. Toquen “Anotar ingreso” o “Anotar gasto” para cargar el primero.")); return; }
+  if(db && loaded && !list.length){ box.replaceChildren(el("p","notice", movs.length? `Todavía no hay nada anotado en ${monthLabel(view.y,view.m,{month:"long"})}. Lo de los meses anteriores se ve tocando ‹ junto al nombre del mes.` : "Todavía no hay nada anotado. Toquen “Anotar ingreso” o “Anotar gasto” para cargar el primero.")); return; }
   box.replaceChildren(...Object.keys(byDay).sort().reverse().map(day=>{
     const items=byDay[day].sort((a,b)=>b.creado.localeCompare(a.creado)), d=sums(items);
     const sec=el("div","day"), head=el("div","dayhead"), [y,m,dd]=day.split("-").map(Number);
