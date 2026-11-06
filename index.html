@@ -1048,6 +1048,9 @@ function makeDb(){
   const subs={}, timers={};
   // Supabase devuelve como mucho 1000 filas por pedido: se piden de a 1000 hasta traer todas.
   async function load(col){
+    // Sin sesión, Supabase contesta como anónimo y las reglas devuelven 0 filas sin error: la app se vería vacía.
+    const {data:ses}=await sbc.auth.getSession();
+    if(!ses || !ses.session) throw {code:"sin_sesion", message:"Se cerró la sesión."};
     const out=[];
     for(let from=0;;from+=1000){ const {data,error}=await sbc.from("docs").select("id,data").eq("coleccion",col).order("id").range(from,from+999); if(error) throw error; out.push(...(data||[])); if(!data || data.length<1000) return out; }
   }
@@ -1114,7 +1117,12 @@ function start(session){
   user={ profiles: async ids=>Object.fromEntries(ids.map(i=>[i,{name:NOMBRES[i]||i}])) };
   if(window.XLSX) $("xls").hidden=false;
   $("pdf").hidden=false;
-  const onErr=()=>{ const s=$("status"); s.hidden=false; s.textContent="Se cortó la conexión con los datos. Recarguen la página."; };
+  const onErr=e=>{
+    if(e && e.code==="sin_sesion"){ sbc.auth.signOut({scope:"local"}).catch(()=>{}).finally(()=>location.reload()); return; }
+    const s=$("status"); s.hidden=false;
+    s.textContent="No se pudieron traer los datos (los datos no se perdieron). Revisen internet y recarguen la página; si sigue igual, avisen a Adrián."+(e&&e.message? " Detalle: "+e.message : "");
+  };
+  sbc.auth.onAuthStateChange(ev=>{ if(ev==="SIGNED_OUT") location.reload(); });
   const S=v=>String(v??"");
   db.collection("movimientos").orderBy("fecha","desc").onSnapshot(snap=>{
     movs=snap.docs.map(d=>{const x=d.data()||{}; return {id:d.id, tipo:x.tipo==="out"?"out":"in", monto:Number(x.monto)||0, fecha:S(x.fecha), categoria:S(x.categoria), nota:S(x.nota), cuenta:S(x.cuenta), casa:S(x.casa), compromiso:S(x.compromiso), resumen:S(x.resumen), periodo:S(x.periodo), moneda:x.moneda==="USD"?"USD":x.moneda==="ARS"?"ARS":"", cambio:S(x.cambio), cotizacion:Number(x.cotizacion)||0, autor:x.autor||null, creado:S(x.creado)};});
